@@ -72,7 +72,7 @@ public class GPXTrackToVerticalAnimator : BaseAnimator
             if (track.Count < 2) continue;
 
             // Berechne die durchschnittliche X-Position für die vertikale Linie
-            float targetX = Margin + availableWidth / _tracks.Count * (iTrack + 1);
+            float targetX = Margin + availableWidth / _tracks.Count * (iTrack + 0.5f);
 
             // Berechne die tatsächliche Länge des ursprünglichen Tracks
             var distances = trackDistances[iTrack]; // Kumulative Distanzen
