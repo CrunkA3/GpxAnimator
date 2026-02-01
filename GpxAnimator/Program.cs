@@ -17,7 +17,13 @@ int fps = 60;
 
 double trackFadeStart = 2.0; // Sekunden
 double trackFadeDuration = 12.0; // Sekunden
-double trackHoldDuration = 3.0; // Sekunden
+double trackHoldDuration = 2.0; // Sekunden
+
+
+double trackFadeEnd = trackFadeStart + trackFadeDuration + trackHoldDuration;
+
+
+double trackVerticalDuration = 12.0; // Sekunden
 
 
 var renderer = new FrameRenderer();
@@ -44,8 +50,19 @@ renderer.AddAnimator(new GPXTrackStaticDisplay(
     color: SKColors.Red,
     strokeWidth: 4,
     start: trackFadeStart + trackFadeDuration,
-    end: trackFadeStart + trackFadeDuration + trackHoldDuration
+    end: trackFadeEnd
 ));
+
+renderer.AddAnimator(new GPXTrackToVerticalAnimator(
+    tracks,         // Deine GPX Tracks
+    width,          // Breite
+    height,         // Höhe
+    SKColors.Red,   // Farbe
+    3.0f,           // Linienbreite
+    trackFadeEnd,
+    trackFadeEnd + trackVerticalDuration
+));
+
 
 
 Console.WriteLine("Starte encoding");
