@@ -16,7 +16,7 @@ int height = 2160;
 int fps = 60;
 
 double trackFadeStart = 2.0; // Sekunden
-double trackFadeDuration = 10.0; // Sekunden
+double trackFadeDuration = 12.0; // Sekunden
 double trackHoldDuration = 3.0; // Sekunden
 
 
@@ -33,7 +33,8 @@ renderer.AddAnimator(new GPXTrackPathAnimator(
     color: SKColors.Red,
     strokeWidth: 4,
     start: trackFadeStart,
-    end: trackFadeStart + trackFadeDuration
+    end: trackFadeStart + trackFadeDuration,
+    trackText: "Tag {0:N0}"
 ));
 
 renderer.AddAnimator(new GPXTrackStaticDisplay(

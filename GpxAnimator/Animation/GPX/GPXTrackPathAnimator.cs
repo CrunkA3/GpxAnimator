@@ -1,6 +1,7 @@
 ﻿using GpxAnimator.Rendering;
 using SkiaSharp;
 using System.Diagnostics;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace GpxAnimator.Animation.GPX;
 
@@ -9,6 +10,10 @@ public class GPXTrackPathAnimator : BaseAnimator
 {
     private readonly List<List<SKPoint>> _tracks;
     private readonly SKPaint _paint;
+    private readonly SKPaint _textPaint;
+    private readonly SKFont _font;
+
+    private readonly string _trackText;
 
     public GPXTrackPathAnimator(
         GPXTracks tracks,
@@ -17,11 +22,15 @@ public class GPXTrackPathAnimator : BaseAnimator
         SKColor color,
         float strokeWidth,
         double start,
-        double end)
+        double end,
+        string trackText)
         : base(start, end)
     {
         var projector = new TrackProjector(tracks);
         _tracks = projector.ProjectAll(tracks, width, height);
+
+
+        _font = new SKFont(SKTypeface.Default, 128);
 
         _paint = new SKPaint
         {
@@ -30,6 +39,15 @@ public class GPXTrackPathAnimator : BaseAnimator
             IsAntialias = true,
             Style = SKPaintStyle.Stroke
         };
+
+        _textPaint = new SKPaint
+        {
+            Color = color,
+            IsAntialias = true,
+            Style = SKPaintStyle.Fill
+        };
+
+        _trackText = trackText;
     }
 
     protected override void RenderFrame(RenderContext ctx, double progress)
@@ -68,5 +86,14 @@ public class GPXTrackPathAnimator : BaseAnimator
 
         }
         ctx.Canvas.DrawPath(path, _paint);
+
+        RenderTrackText(ctx, visibleTracksCount);
+    }
+
+    private void RenderTrackText(RenderContext ctx, int trackNumber)
+    {
+        if (string.IsNullOrEmpty(_trackText)) return;
+
+        ctx.Canvas.DrawText(string.Format(_trackText, trackNumber), 50, 100, _font, _textPaint);
     }
 }

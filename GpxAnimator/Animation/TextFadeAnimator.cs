@@ -18,7 +18,7 @@ public class TextFadeAnimator : BaseAnimator
         : base(start, end)
     {
         _text = text;
-        _font = new SKFont(SKTypeface.Default, 128);
+        _font = new SKFont(SKTypeface.Default, 180);
         _paint = new SKPaint()
         {
             Color = SKColors.White,
@@ -28,9 +28,9 @@ public class TextFadeAnimator : BaseAnimator
 
     protected override void RenderFrame(RenderContext ctx, double progress)
     {
-        byte alpha = (byte)(progress * 255);
+        byte alpha = (byte)(1 - progress * 255);
         _paint.Color = new SKColor(255, 255, 255, alpha);
 
-        ctx.Canvas.DrawText(_text, 100, 200, _font, _paint);
+        ctx.Canvas.DrawText(_text, 1080, 1080, SKTextAlign.Center, _font, _paint);
     }
 }
