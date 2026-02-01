@@ -38,10 +38,16 @@ public class TrackProjector
         float availableWidth = width - 2 * Margin;
         float availableHeight = height - 2 * Margin;
 
+        float latScale = (float)(availableHeight / latRange);
+        float lonScale = (float)(availableWidth / lonRange);
+
+        float scale = Math.Min(latScale, lonScale);
+
         return track.Points.Select(p =>
         {
-            float x = (float)((p.Lon - _minLon) / lonRange * availableWidth) + Margin;
-            float y = (float)((1 - (p.Lat - _minLat) / latRange) * availableHeight) + Margin;
+            float x = (float)((p.Lon - _minLon) * scale) + Margin;
+            float y = (float)((latRange - (p.Lat - _minLat)) * scale) + Margin;
+
             return new SKPoint(x, y);
         }).ToList();
     }
