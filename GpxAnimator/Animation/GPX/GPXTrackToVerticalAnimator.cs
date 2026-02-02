@@ -6,9 +6,12 @@ namespace GpxAnimator.Animation.GPX;
 public class GPXTrackToVerticalAnimator : BaseAnimator
 {
     private readonly List<List<SKPoint>> _tracks;
+    private readonly List<List<float>> _trackDistances;
     private readonly SKPaint _paint;
     private readonly int _height;
     private readonly int _width;
+    private readonly float _strokeWidthStart;
+    private readonly float _strokeWidthEnd;
 
     public float Margin { get; set; } = 100f;
 
@@ -17,20 +20,27 @@ public class GPXTrackToVerticalAnimator : BaseAnimator
         int width,
         int height,
         SKColor color,
-        float strokeWidth,
+        float strokeWidthStart,
+        float strokeWidthEnd,
         double start,
         double end)
         : base(start, end)
     {
         var projector = new TrackProjector(tracks);
         _tracks = projector.ProjectAll(tracks, width, height);
+
+        var distances = TrackProjector.ToDistances(tracks);
+        _trackDistances = distances;
+
         _height = height;
         _width = width;
+        _strokeWidthStart = strokeWidthStart;
+        _strokeWidthEnd = strokeWidthEnd;
 
         _paint = new SKPaint
         {
             Color = color,
-            StrokeWidth = strokeWidth,
+            StrokeWidth = strokeWidthStart,
             IsAntialias = true,
             Style = SKPaintStyle.Stroke
         };
@@ -47,23 +57,8 @@ public class GPXTrackToVerticalAnimator : BaseAnimator
 
 
 
-        var trackDistances = _tracks.Select(track =>
-        {
-            var totalDistance = 0f;
-            var distances = new List<float> { 0 }; // Kumulative Distanzen
-            for (int i = 1; i < track.Count; i++)
-            {
-                float dx = track[i].X - track[i - 1].X;
-                float dy = track[i].Y - track[i - 1].Y;
-                float distance = MathF.Sqrt(dx * dx + dy * dy);
-                totalDistance += distance;
-                distances.Add(totalDistance);
-            }
 
-            return distances;
-        }).ToArray();
-
-        var maxDistance = trackDistances.Max(distances => distances.Last());
+        var maxDistance = _trackDistances.Max(distances => distances.Last());
         var distanceScale = availableHeight / maxDistance;
 
         for (int iTrack = 0; iTrack < _tracks.Count; iTrack++)
@@ -75,7 +70,7 @@ public class GPXTrackToVerticalAnimator : BaseAnimator
             float targetX = Margin + availableWidth / _tracks.Count * (iTrack + 0.5f);
 
             // Berechne die tatsächliche Länge des ursprünglichen Tracks
-            var distances = trackDistances[iTrack]; // Kumulative Distanzen
+            var distances = _trackDistances[iTrack]; // Kumulative Distanzen
             float totalDistance = distances.Last();
 
             // Berechne die Y-Position für den Start der vertikalen Linie (zentriert)
@@ -108,6 +103,8 @@ public class GPXTrackToVerticalAnimator : BaseAnimator
                 }
             }
         }
+
+        _paint.StrokeWidth = _strokeWidthStart + (_strokeWidthEnd - _strokeWidthStart) * (float)progress;
 
         ctx.Canvas.DrawPath(path, _paint);
     }

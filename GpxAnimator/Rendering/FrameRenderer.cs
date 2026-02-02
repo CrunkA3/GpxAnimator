@@ -17,7 +17,7 @@ public class FrameRenderer
     {
         var ctx = new RenderContext(canvas, width, height);
 
-        canvas.Clear(SKColors.Black);
+        canvas.Clear(SKColors.Transparent);
 
         foreach (var animator in _animators)
             animator.Render(ctx, time);
