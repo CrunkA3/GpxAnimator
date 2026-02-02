@@ -7,6 +7,7 @@ public class GPXVerticalAnimator : BaseAnimator
 {
     private readonly List<List<float>> _trackDistances;
     private readonly SKPaint _paint;
+    private readonly SKPaint _circlePaint;
     private readonly int _height;
     private readonly int _width;
     private readonly float _circleWidth;
@@ -38,6 +39,14 @@ public class GPXVerticalAnimator : BaseAnimator
             StrokeWidth = strokeWidth,
             IsAntialias = true,
             Style = SKPaintStyle.Stroke
+        };
+
+        _circlePaint = new SKPaint
+        {
+            Color = color,
+            StrokeWidth = strokeWidth,
+            IsAntialias = true,
+            Style = SKPaintStyle.Fill
         };
     }
 
@@ -83,7 +92,7 @@ public class GPXVerticalAnimator : BaseAnimator
             // Berechne die aktuelle Höhe basierend auf dem individuellen Fortschritt
             if (trackProgress > 0)
             {
-                ctx.Canvas.DrawCircle(targetX, bottomY - Math.Min((float)(maxDistance * trackProgress), totalDistance) * distanceScale, _circleWidth, _paint);
+                ctx.Canvas.DrawCircle(targetX, bottomY - Math.Min((float)(maxDistance * trackProgress), totalDistance) * distanceScale, _circleWidth, _circlePaint);
             }
         }
 
