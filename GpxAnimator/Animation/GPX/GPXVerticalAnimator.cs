@@ -53,10 +53,18 @@ public class GPXVerticalAnimator : BaseAnimator
         var maxDistance = _trackDistances.Max(distances => distances.Last());
         var distanceScale = availableHeight / maxDistance;
 
+        // Offset-Faktor für die Versetzung (z.B. 0.2 bedeutet 20% Versetzung)
+        double staggerAmount = 0.15;
+
         for (int iTrack = 0; iTrack < _trackDistances.Count; iTrack++)
         {
             var track = _trackDistances[iTrack];
             if (track.Count < 2) continue;
+
+            // Berechne den individuellen Progress für diesen Track
+            double trackOffset = (iTrack / (double)_trackDistances.Count) * staggerAmount;
+            double trackProgress = (progress - trackOffset) / (1.0 - staggerAmount);
+            trackProgress = Math.Clamp(trackProgress, 0.0, 1.0);
 
             // Berechne die durchschnittliche X-Position für die vertikale Linie
             float targetX = Margin + availableWidth / _trackDistances.Count * (iTrack + 0.5f);
@@ -72,8 +80,11 @@ public class GPXVerticalAnimator : BaseAnimator
             path.MoveTo(targetX, bottomY);
             path.LineTo(targetX, topY);
 
-            // Berechne die aktuelle Höhe basierend auf dem Fortschritt
-            ctx.Canvas.DrawCircle(targetX, bottomY - Math.Min((float)(maxDistance * progress), totalDistance) * distanceScale, _circleWidth, _paint);
+            // Berechne die aktuelle Höhe basierend auf dem individuellen Fortschritt
+            if (trackProgress > 0)
+            {
+                ctx.Canvas.DrawCircle(targetX, bottomY - Math.Min((float)(maxDistance * trackProgress), totalDistance) * distanceScale, _circleWidth, _paint);
+            }
         }
 
         ctx.Canvas.DrawPath(path, _paint);
