@@ -8,9 +8,13 @@ public class GPXVerticalAnimator : BaseAnimator
     private readonly List<List<float>> _trackDistances;
     private readonly SKPaint _paint;
     private readonly SKPaint _circlePaint;
+    private readonly SKPaint _textPaint;
+    private readonly SKFont _font;
+
     private readonly int _height;
     private readonly int _width;
     private readonly float _circleWidth;
+    private readonly string _distanceText;
 
     public float Margin { get; set; } = 100f;
 
@@ -23,7 +27,8 @@ public class GPXVerticalAnimator : BaseAnimator
         float circleWidth,
         double start,
         double end,
-        double hold)
+        double hold,
+        string distanceText)
         : base(start, end, hold)
     {
         var distances = TrackProjector.ToDistances(tracks);
@@ -32,6 +37,9 @@ public class GPXVerticalAnimator : BaseAnimator
         _height = height;
         _width = width;
         _circleWidth = circleWidth;
+        _distanceText = distanceText;
+
+        _font = new SKFont(SKTypeface.Default, 128);
 
         _paint = new SKPaint
         {
@@ -45,6 +53,13 @@ public class GPXVerticalAnimator : BaseAnimator
         {
             Color = color,
             StrokeWidth = strokeWidth,
+            IsAntialias = true,
+            Style = SKPaintStyle.Fill
+        };
+
+        _textPaint = new SKPaint
+        {
+            Color = color,
             IsAntialias = true,
             Style = SKPaintStyle.Fill
         };
@@ -64,6 +79,9 @@ public class GPXVerticalAnimator : BaseAnimator
 
         // Offset-Faktor für die Versetzung (z.B. 0.2 bedeutet 20% Versetzung)
         double staggerAmount = 0.15;
+
+        // Aktuelle Gesamtdistanz, die bereits gezeichnet wurde
+        double currentDistance = 0;
 
         for (int iTrack = 0; iTrack < _trackDistances.Count; iTrack++)
         {
@@ -94,8 +112,17 @@ public class GPXVerticalAnimator : BaseAnimator
             {
                 ctx.Canvas.DrawCircle(targetX, bottomY - Math.Min((float)(maxDistance * trackProgress), totalDistance) * distanceScale, _circleWidth, _circlePaint);
             }
+
+            currentDistance += totalDistance * trackProgress;
         }
 
         ctx.Canvas.DrawPath(path, _paint);
+        RenderDistanceText(ctx, currentDistance / 1_000);
+    }
+    private void RenderDistanceText(RenderContext ctx, double distance)
+    {
+        if (string.IsNullOrEmpty(_distanceText)) return;
+
+        ctx.Canvas.DrawText(string.Format(_distanceText, distance), 50, 100, _font, _textPaint);
     }
 }

@@ -72,7 +72,8 @@ renderer.AddAnimator(new GPXVerticalAnimator(
     16.0f,          // Kreisbreite
     verticalStart,
     verticalStart + verticalDuration,
-    verticalHoldDuration
+    verticalHoldDuration,
+    "{0:N0} km"
 ));
 
 
