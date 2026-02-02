@@ -81,6 +81,7 @@ Console.WriteLine("Starte encoding");
 using var encoder = new VideoEncoder(@"C:\temp\output.mp4", width, height, fps);
 
 int totalFrames = (int)(renderer.Duration * fps);
+var startTime = DateTime.Now;
 
 for (int i = 0; i < totalFrames; i++)
 {
@@ -95,7 +96,18 @@ for (int i = 0; i < totalFrames; i++)
     using var bitmap = SKBitmap.FromImage(snapshot);
 
     encoder.AddFrame(bitmap);
+
+    // Fortschrittsanzeige
+    if (i % 10 == 0 || i == totalFrames - 1)
+    {
+        double progress = (i + 1) / (double)totalFrames * 100;
+        var elapsed = DateTime.Now - startTime;
+        var estimatedTotal = elapsed.TotalSeconds / (i + 1) * totalFrames;
+        var remaining = TimeSpan.FromSeconds(estimatedTotal - elapsed.TotalSeconds);
+
+        Console.Write($"\rFrame {i + 1}/{totalFrames} ({progress:F1}%) - Verbleibend: {remaining:mm\\:ss}");
+    }
 }
 
-
+Console.WriteLine();
 Console.WriteLine("Fertig");
