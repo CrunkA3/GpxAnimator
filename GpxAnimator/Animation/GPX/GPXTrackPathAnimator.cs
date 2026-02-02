@@ -14,6 +14,8 @@ public class GPXTrackPathAnimator : BaseAnimator
     private readonly SKFont _font;
 
     private readonly string _trackText;
+    private readonly int _totalPoints;
+    private readonly double[] _trackProgressThresholds;
 
     public GPXTrackPathAnimator(
         GPXTracks tracks,
@@ -30,6 +32,16 @@ public class GPXTrackPathAnimator : BaseAnimator
         var projector = new TrackProjector(tracks);
         _tracks = projector.ProjectAll(tracks, width, height);
 
+        // Calculate total points across all tracks
+        _totalPoints = _tracks.Sum(t => t.Count);
+
+        // Calculate cumulative progress thresholds for each track based on point count
+        _trackProgressThresholds = new double[_tracks.Count + 1];
+        _trackProgressThresholds[0] = 0;
+        for (int i = 0; i < _tracks.Count; i++)
+        {
+            _trackProgressThresholds[i + 1] = _trackProgressThresholds[i] + (double)_tracks[i].Count / _totalPoints;
+        }
 
         _font = new SKFont(SKTypeface.Default, 128);
 
@@ -55,40 +67,61 @@ public class GPXTrackPathAnimator : BaseAnimator
     {
         if (progress == 0) return;
 
-        // progress = 0..1
-        int visibleTracksCount = Math.Min((int)(_tracks.Count * progress) + 1, _tracks.Count);
-        double subProgress = Math.Clamp((progress - (visibleTracksCount - 1) * (1f / _tracks.Count)) / (1f / _tracks.Count), 0, 1);
+        // Find which track we're currently animating based on progress
+        int currentTrackIndex = 0;
+        for (int i = 0; i < _tracks.Count; i++)
+        {
+            if (progress <= _trackProgressThresholds[i + 1])
+            {
+                currentTrackIndex = i;
+                break;
+            }
+        }
 
-
+        // Calculate progress within the current track
+        double trackProgress = 0;
+        double thresholdRange = _trackProgressThresholds[currentTrackIndex + 1] - _trackProgressThresholds[currentTrackIndex];
+        if (thresholdRange > 0)
+        {
+            trackProgress = Math.Clamp((progress - _trackProgressThresholds[currentTrackIndex]) / thresholdRange, 0, 1);
+        }
 
         using var path = new SKPath();
 
-        for (int iTrack = 0; iTrack < visibleTracksCount; iTrack++)
+        // Render all completed tracks
+        for (int iTrack = 0; iTrack < currentTrackIndex; iTrack++)
         {
-            var visiblePointsCount = iTrack < visibleTracksCount - 1 ? _tracks[iTrack].Count : (int)(_tracks[iTrack].Count * subProgress);
-            if (visiblePointsCount < 2) continue;
+            if (_tracks[iTrack].Count < 2) continue;
 
             path.MoveTo(_tracks[iTrack][0]);
-
-            for (int iPoint = 1; iPoint < visiblePointsCount; iPoint++)
+            for (int iPoint = 1; iPoint < _tracks[iTrack].Count; iPoint++)
                 path.LineTo(_tracks[iTrack][iPoint]);
+        }
 
+        // Render current track with progress
+        if (currentTrackIndex < _tracks.Count && _tracks[currentTrackIndex].Count >= 2)
+        {
+            var visiblePointsCount = Math.Max(1, (int)(_tracks[currentTrackIndex].Count * trackProgress));
 
-            // show current position with a circle
-            if (iTrack == visibleTracksCount - 1)
+            path.MoveTo(_tracks[currentTrackIndex][0]);
+            for (int iPoint = 1; iPoint < visiblePointsCount; iPoint++)
+                path.LineTo(_tracks[currentTrackIndex][iPoint]);
+
+            // Show current position with a circle
+            if (visiblePointsCount > 0)
             {
-                ctx.Canvas.DrawCircle(_tracks[iTrack][visiblePointsCount - 1], _paint.StrokeWidth * 2f, new SKPaint
+                ctx.Canvas.DrawCircle(_tracks[currentTrackIndex][visiblePointsCount - 1], _paint.StrokeWidth * 2f, new SKPaint
                 {
                     Color = _paint.Color,
                     IsAntialias = true,
                     Style = SKPaintStyle.Fill
                 });
             }
-
         }
+
         ctx.Canvas.DrawPath(path, _paint);
 
-        RenderTrackText(ctx, visibleTracksCount);
+        RenderTrackText(ctx, currentTrackIndex + 1);
     }
 
     private void RenderTrackText(RenderContext ctx, int trackNumber)
