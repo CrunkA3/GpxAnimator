@@ -23,8 +23,9 @@ public class GPXTrackPathAnimator : BaseAnimator
         float strokeWidth,
         double start,
         double end,
+        double hold,
         string trackText)
-        : base(start, end)
+        : base(start, end, hold)
     {
         var projector = new TrackProjector(tracks);
         _tracks = projector.ProjectAll(tracks, width, height);

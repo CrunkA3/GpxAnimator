@@ -17,7 +17,7 @@ int fps = 60;
 
 double trackFadeStart = 2.0; // Sekunden
 double trackFadeDuration = 12.0; // Sekunden
-double trackHoldDuration = 2.0; // Sekunden
+double trackHoldDuration = 1.0; // Sekunden
 
 
 double trackFadeEnd = trackFadeStart + trackFadeDuration + trackHoldDuration;
@@ -40,18 +40,10 @@ renderer.AddAnimator(new GPXTrackPathAnimator(
     strokeWidth: 4,
     start: trackFadeStart,
     end: trackFadeStart + trackFadeDuration,
+    hold: trackHoldDuration,
     trackText: "Tag {0:N0}"
 ));
 
-renderer.AddAnimator(new GPXTrackStaticDisplay(
-    tracks,
-    width: width,
-    height: height,
-    color: SKColors.Red,
-    strokeWidth: 4,
-    start: trackFadeStart + trackFadeDuration,
-    end: trackFadeEnd
-));
 
 
 // GPX Track Vertikal Animation
