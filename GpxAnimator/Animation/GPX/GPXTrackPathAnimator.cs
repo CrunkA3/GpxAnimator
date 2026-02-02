@@ -110,7 +110,7 @@ public class GPXTrackPathAnimator : BaseAnimator
             // Show current position with a circle
             if (visiblePointsCount > 0)
             {
-                ctx.Canvas.DrawCircle(_tracks[currentTrackIndex][visiblePointsCount - 1], _paint.StrokeWidth * 2f, new SKPaint
+                ctx.Canvas.DrawCircle(_tracks[currentTrackIndex][visiblePointsCount - 1], _paint.StrokeWidth * 4f, new SKPaint
                 {
                     Color = _paint.Color,
                     IsAntialias = true,

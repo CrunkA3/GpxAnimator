@@ -23,10 +23,10 @@ double trackHoldDuration = 1.0; // Sekunden
 double trackFadeEnd = trackFadeStart + trackFadeDuration + trackHoldDuration;
 
 
-double trackToVerticalDuration = 6.0; // Sekunden
+double trackToVerticalDuration = 5.0; // Sekunden
 
 double verticalStart = trackFadeEnd + trackToVerticalDuration;
-double verticalDuration = 6.0; // Sekunden
+double verticalDuration = 3.0; // Sekunden
 double verticalHoldDuration = 10.0; // Sekunden
 
 var renderer = new FrameRenderer();
@@ -34,7 +34,14 @@ var renderer = new FrameRenderer();
 
 Console.WriteLine("Add Animators");
 
-renderer.AddAnimator(new TextFadeAnimator("run the date", 0, 3));
+renderer.AddAnimator(new TextFadeAnimator(
+    text: "run the date",
+    start: 0,
+    end: 3,
+    fontSizeStart: 180,
+    fontSizeEnd: 300
+));
+
 renderer.AddAnimator(new GPXTrackPathAnimator(
     tracks,
     width: width,
