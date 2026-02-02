@@ -23,8 +23,11 @@ double trackHoldDuration = 1.0; // Sekunden
 double trackFadeEnd = trackFadeStart + trackFadeDuration + trackHoldDuration;
 
 
-double trackVerticalDuration = 6.0; // Sekunden
+double trackToVerticalDuration = 6.0; // Sekunden
 
+double verticalStart = trackFadeEnd + trackToVerticalDuration;
+double verticalDuration = 8.0; // Sekunden
+double verticalHoldDuration = 5.0; // Sekunden
 
 var renderer = new FrameRenderer();
 
@@ -46,7 +49,7 @@ renderer.AddAnimator(new GPXTrackPathAnimator(
 
 
 
-// GPX Track Vertikal Animation
+// GPX Track to Vertikal Animation
 renderer.AddAnimator(new GPXTrackToVerticalAnimator(
     tracks,         // Deine GPX Tracks
     width,          // Breite
@@ -55,7 +58,21 @@ renderer.AddAnimator(new GPXTrackToVerticalAnimator(
     3.0f,           // Linienbreite am Anfang
     8.0f,           // Linienbreite am Ende
     trackFadeEnd,
-    trackFadeEnd + trackVerticalDuration
+    verticalStart
+));
+
+
+// GPX Vertikal Animation
+renderer.AddAnimator(new GPXVerticalAnimator(
+    tracks,         // Deine GPX Tracks
+    width,          // Breite
+    height,         // Höhe
+    SKColors.Red,   // Farbe
+    8.0f,           // Linienbreite
+    16.0f,          // Kreisbreite
+    verticalStart,
+    verticalStart + verticalDuration,
+    verticalHoldDuration
 ));
 
 
