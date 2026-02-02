@@ -27,7 +27,7 @@ double trackToVerticalDuration = 6.0; // Sekunden
 
 double verticalStart = trackFadeEnd + trackToVerticalDuration;
 double verticalDuration = 6.0; // Sekunden
-double verticalHoldDuration = 5.0; // Sekunden
+double verticalHoldDuration = 10.0; // Sekunden
 
 var renderer = new FrameRenderer();
 
