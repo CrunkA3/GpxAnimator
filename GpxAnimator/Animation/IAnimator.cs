@@ -6,6 +6,7 @@ public interface IAnimator
 {
     double StartTime { get; }
     double EndTime { get; }
+    double? HoldTime { get; }
 
     /// <summary>
     /// Wird pro Frame aufgerufen.

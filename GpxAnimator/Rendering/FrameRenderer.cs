@@ -8,7 +8,7 @@ public class FrameRenderer
 {
     private readonly List<IAnimator> _animators = [];
 
-    public double Duration => _animators.Max(x => x.EndTime);
+    public double Duration => _animators.Max(x => x.EndTime + x.HoldTime.GetValueOrDefault(0));
 
     public void AddAnimator(IAnimator animator)
         => _animators.Add(animator);
